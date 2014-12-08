@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.blaznyoght</groupId>
+	<artifactId>oscerialscope</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
 		<plugins>
@@ -80,6 +81,15 @@
 			<artifactId>pivot-wtk-terra</artifactId>
 			<version>2.0.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pivot</groupId>
+			<artifactId>pivot-jfree</artifactId>
+			<version>2.0.3</version>
+		</dependency>
 	</dependencies>
-	<artifactId>oscerialscope</artifactId>
 </project>

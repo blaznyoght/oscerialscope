@@ -1,6 +1,7 @@
-<Window title="%oscerialscope" maximized="true"
+<mainWindow:MainWindow title="%oscerialscope" maximized="true"
     xmlns:content="org.apache.pivot.wtk.content"
-	xmlns:bxml="http://pivot.apache.org/bxml" 
+	xmlns:bxml="http://pivot.apache.org/bxml"
+	xmlns:mainWindow="org.blaznyoght.oscerialscope.ui" 
 	xmlns="org.apache.pivot.wtk">
 	<TabPane bxml:id="tabPane">
 		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
@@ -8,8 +9,13 @@
 				<content:ButtonData text="%generate" />
 			</TabPane.tabData>
 			<Border styles="{padding:2}">
-				<Label text="240x180" preferredWidth="240" preferredHeight="180"
-					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+        		<BoxPane orientation="vertical" styles="{spacing:6}">
+	            	<Label text="%source_file" styles="{font:{bold:true}}"/>
+					<PushButton bxml:id="chooseSourceFile" buttonData="%choose_source_file"/>
+	            	<Label text="%target_file" styles="{font:{bold:true}}"/>
+					<PushButton bxml:id="chooseTargetFile" buttonData="%choose_target_file"/>
+					<PushButton bxml:id="generateFile" buttonData="%generate_file"/>
+				</BoxPane>
 			</Border>
 		</BoxPane>
 
@@ -18,8 +24,8 @@
 				<content:ButtonData text="%capture" />
 			</TabPane.tabData>
 			<Border styles="{padding:2}">
-				<Label text="320x240" preferredWidth="320" preferredHeight="240"
-					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+        		<BoxPane orientation="vertical" styles="{spacing:6}">
+        		</BoxPane>
 			</Border>
 		</BoxPane>
 
@@ -33,4 +39,4 @@
 			</Border>
 		</BoxPane>
 	</TabPane>
-</Window>
+</mainWindow:MainWindow>
