@@ -1,0 +1,36 @@
+<Window title="%oscerialscope" maximized="true"
+    xmlns:content="org.apache.pivot.wtk.content"
+	xmlns:bxml="http://pivot.apache.org/bxml" 
+	xmlns="org.apache.pivot.wtk">
+	<TabPane bxml:id="tabPane">
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+			<TabPane.tabData>
+				<content:ButtonData text="%generate" />
+			</TabPane.tabData>
+			<Border styles="{padding:2}">
+				<Label text="240x180" preferredWidth="240" preferredHeight="180"
+					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+			</Border>
+		</BoxPane>
+
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+			<TabPane.tabData>
+				<content:ButtonData text="%capture" />
+			</TabPane.tabData>
+			<Border styles="{padding:2}">
+				<Label text="320x240" preferredWidth="320" preferredHeight="240"
+					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+			</Border>
+		</BoxPane>
+
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+			<TabPane.tabData>
+				<content:ButtonData text="%view_listen" />
+			</TabPane.tabData>
+			<Border styles="{padding:2}">
+				<Label text="480x360" preferredWidth="480" preferredHeight="360"
+					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+			</Border>
+		</BoxPane>
+	</TabPane>
+</Window>
