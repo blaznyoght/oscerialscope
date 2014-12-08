@@ -98,6 +98,9 @@ public class MainWindow extends Window implements Bindable {
 					if (!result) {
 						throw new FunctionalException("generator_error");
 					}
+					else {
+						Alert.alert(MessageType.INFO, "done", MainWindow.this);
+					}
 				}
 				catch(FunctionalException | IOException | UnsupportedAudioFileException e) {
 					LOG.error("Generator error", e);

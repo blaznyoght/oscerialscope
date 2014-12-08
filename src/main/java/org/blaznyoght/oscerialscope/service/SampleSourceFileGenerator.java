@@ -1,10 +1,12 @@
 package org.blaznyoght.oscerialscope.service;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,7 +49,8 @@ public class SampleSourceFileGenerator {
 			return false;
 		}
 		try (
-				AudioInputStream audioStream = AudioSystem.getAudioInputStream(new FileInputStream(sourceFile));
+				InputStream is = new BufferedInputStream(new FileInputStream(sourceFile));
+				AudioInputStream audioStream = AudioSystem.getAudioInputStream(is);
 				PrintStream writer = new PrintStream(new FileOutputStream(targetFile));
 			) {
 			
