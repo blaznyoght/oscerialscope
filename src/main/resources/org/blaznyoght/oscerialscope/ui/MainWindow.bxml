@@ -11,9 +11,15 @@
 			<Border styles="{padding:2}">
         		<BoxPane orientation="vertical" styles="{spacing:6}">
 	            	<Label text="%source_file" styles="{font:{bold:true}}"/>
-					<PushButton bxml:id="chooseSourceFile" buttonData="%choose_source_file"/>
+	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
+	            		<Label bxml:id="labelSourceFile" text="%none" />
+						<PushButton bxml:id="chooseSourceFile" buttonData="%choose_source_file"/>
+					</BoxPane>
 	            	<Label text="%target_file" styles="{font:{bold:true}}"/>
-					<PushButton bxml:id="chooseTargetFile" buttonData="%choose_target_file"/>
+	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
+	            		<Label bxml:id="labelTargetFile" text="%none" />
+						<PushButton bxml:id="chooseTargetFile" buttonData="%choose_target_file"/>
+					</BoxPane>
 					<PushButton bxml:id="generateFile" buttonData="%generate_file"/>
 				</BoxPane>
 			</Border>
@@ -34,8 +40,8 @@
 				<content:ButtonData text="%view_listen" />
 			</TabPane.tabData>
 			<Border styles="{padding:2}">
-				<Label text="480x360" preferredWidth="480" preferredHeight="360"
-					styles="{horizontalAlignment:'center', verticalAlignment:'center'}" />
+        		<BoxPane orientation="vertical" styles="{spacing:6}">
+        		</BoxPane>
 			</Border>
 		</BoxPane>
 	</TabPane>

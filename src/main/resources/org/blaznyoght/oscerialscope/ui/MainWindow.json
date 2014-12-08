@@ -5,6 +5,7 @@
 	choose_source_file: "Choose source file",
 	target_file: "Target file:",
 	choose_target_file: "Choose target file",
+	none: "No file",
 	generate_file: "Generate file",
 	capture: "Capture output",
 	view_listen: "View/Listen",

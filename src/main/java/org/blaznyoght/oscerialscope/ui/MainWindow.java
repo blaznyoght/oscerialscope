@@ -16,6 +16,7 @@ import org.apache.pivot.wtk.Alert;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
 import org.apache.pivot.wtk.FileBrowserSheet;
+import org.apache.pivot.wtk.Label;
 import org.apache.pivot.wtk.MessageType;
 import org.apache.pivot.wtk.PushButton;
 import org.apache.pivot.wtk.Sheet;
@@ -29,11 +30,14 @@ public class MainWindow extends Window implements Bindable {
 	
 	@BXML
 	private PushButton chooseSourceFile = null;
-	
+	@BXML
+	private Label labelSourceFile = null;
 	private File sourceFile = null;
 
 	@BXML
 	private PushButton chooseTargetFile = null;
+	@BXML
+	private Label labelTargetFile = null;
 	
 	private File targetFile = null;
 
@@ -57,6 +61,7 @@ public class MainWindow extends Window implements Bindable {
                     public void sheetClosed(Sheet sheet) {
                         if (sheet.getResult()) {
                             sourceFile = fileBrowserSheet.getSelectedFiles().get(0);
+                            labelSourceFile.setText(sourceFile.getName());
                         }
                     }
                 });
@@ -72,6 +77,7 @@ public class MainWindow extends Window implements Bindable {
                     public void sheetClosed(Sheet sheet) {
                         if (sheet.getResult()) {
                             targetFile = fileBrowserSheet.getSelectedFiles().get(0);
+                            labelTargetFile.setText(targetFile.getName());
                         }
                     }
                 });
