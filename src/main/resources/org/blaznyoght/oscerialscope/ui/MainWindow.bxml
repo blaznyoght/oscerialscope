@@ -4,7 +4,7 @@
 	xmlns:mainWindow="org.blaznyoght.oscerialscope.ui" 
 	xmlns="org.apache.pivot.wtk">
 	<TabPane bxml:id="tabPane">
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
 			<TabPane.tabData>
 				<content:ButtonData text="%generate" />
 			</TabPane.tabData>
@@ -25,17 +25,30 @@
 			</Border>
 		</BoxPane>
 
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
 			<TabPane.tabData>
 				<content:ButtonData text="%capture" />
 			</TabPane.tabData>
 			<Border styles="{padding:2}">
         		<BoxPane orientation="vertical" styles="{spacing:6}">
+	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
+        				<ListView bxml:id="serialInterfaceListView" selectMode="single" />
+        				<PushButton bxml:id="refreshSerialPortList" buttonData="%refresh_list" />
+        			</BoxPane>
+	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
+        				<PushButton bxml:id="startCapture" buttonData="%start_capture" />
+        				<PushButton bxml:id="stopCapture" buttonData="%stop_capture" enabled="false"/>
+	            	</BoxPane>
+	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
+        				<ListView bxml:id="captureList" selectMode="none" listData="['None']"/>
+        				<PushButton bxml:id="removeCapture" buttonData="%remove_capture" />
+	            	</BoxPane>
+	            	<Label bxml:id="captureStatusLabel" text="" styles="{font:{italic:true}}"/>
         		</BoxPane>
 			</Border>
 		</BoxPane>
 
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
 			<TabPane.tabData>
 				<content:ButtonData text="%view_listen" />
 			</TabPane.tabData>
