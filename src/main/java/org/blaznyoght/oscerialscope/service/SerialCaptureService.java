@@ -20,6 +20,8 @@ public class SerialCaptureService {
 	State currentState = State.STOPPED;
 	CaptureThread currentCapture = null;
 
+	private List<CaptureResult> captureResultList = new ArrayList<CaptureResult>();
+
 	private static enum State {
 		STARTED(), STOPPED();
 	}
@@ -80,8 +82,6 @@ public class SerialCaptureService {
 
 	}
 
-	private List<CaptureResult> captureResultList = new ArrayList<CaptureResult>();
-
 	public List<String> listSerialPorts() {
 		return Arrays.asList(SerialPortList.getPortNames());
 	}
@@ -116,7 +116,15 @@ public class SerialCaptureService {
 	}
 
 	public int getCaptureProgress() {
-		return currentCapture.getResult().getBuffer().size();
+		return currentCapture.getResult().getSampleCount();
+	}
+
+	public List<CaptureResult> getCaptureResultList() {
+		return captureResultList;
+	}
+
+	public void removeCapture(CaptureResult capture) {
+		captureResultList.remove(capture);
 	}
 
 }

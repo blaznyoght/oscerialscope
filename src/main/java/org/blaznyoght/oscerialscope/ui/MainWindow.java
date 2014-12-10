@@ -23,11 +23,13 @@ import org.apache.pivot.wtk.ButtonPressListener;
 import org.apache.pivot.wtk.FileBrowserSheet;
 import org.apache.pivot.wtk.Label;
 import org.apache.pivot.wtk.ListView;
+import org.apache.pivot.wtk.ListView.SelectMode;
 import org.apache.pivot.wtk.MessageType;
 import org.apache.pivot.wtk.PushButton;
 import org.apache.pivot.wtk.Sheet;
 import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.Window;
+import org.blaznyoght.oscerialscope.model.CaptureResult;
 import org.blaznyoght.oscerialscope.service.SampleSourceFileGenerator;
 import org.blaznyoght.oscerialscope.service.SerialCaptureService;
 import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
@@ -105,11 +107,20 @@ public class MainWindow extends Window implements Bindable {
 				String port = (String) serialInterfaceListView
 						.getSelectedItem();
 				try {
+					if (port == null) {
+						throw new FunctionalException("No port selected");
+					}
 					serialCaptureService.startCapture(port);
 					refreshCaptureIhm(true);
 					final Task<Integer> refreshStatusTask = new Task<Integer>() {
 						@Override
 						public Integer execute() throws TaskExecutionException {
+							try {
+								Thread.sleep(1000);
+							}
+							catch(InterruptedException e) {
+								throw new TaskExecutionException(e);
+							}
 							return serialCaptureService.getCaptureProgress();
 						}
 						
@@ -126,12 +137,11 @@ public class MainWindow extends Window implements Bindable {
 						}
 						@Override
 						public void executeFailed(Task<Integer> task) {
-							Alert.alert(MessageType.ERROR, task.getFault().getMessage(), MainWindow.this);
+							handleException(task.getFault());
 						}
 					});
-				} catch (InvalidStateException e) {
-					Alert.alert(MessageType.ERROR, e.getMessage(),
-							MainWindow.this);
+				} catch (InvalidStateException | FunctionalException e) {
+					handleException(e);
 				}
 			}
 		});
@@ -143,15 +153,25 @@ public class MainWindow extends Window implements Bindable {
 					refreshCaptureIhm(false);
 					Alert.alert(MessageType.INFO, message, MainWindow.this);
 				} catch (InvalidStateException e) {
-					Alert.alert(MessageType.ERROR, e.getMessage(),
-							MainWindow.this);
+					handleException(e);
 				}
 			}
 		});
 		removeCapture.getButtonPressListeners().add(new ButtonPressListener() {
 			@Override
 			public void buttonPressed(Button button) {
-
+				try {
+					CaptureResult capture = (CaptureResult) captureList.getSelectedItem();
+					if (capture == null) {
+						throw new FunctionalException("No capture selected");
+					}
+					serialCaptureService.removeCapture(capture);
+					refreshCaptureList();
+					
+				}
+				catch(FunctionalException e) {
+					handleException(e);
+				}
 			}
 		});
 	}
@@ -172,6 +192,7 @@ public class MainWindow extends Window implements Bindable {
 			stopCapture.setEnabled(true);
 			removeCapture.setEnabled(false);
 			captureList.setEnabled(false);
+			captureList.setSelectMode(SelectMode.NONE);
 		}
 		else {
 			serialInterfaceListView.setEnabled(true);
@@ -180,7 +201,16 @@ public class MainWindow extends Window implements Bindable {
 			stopCapture.setEnabled(false);
 			removeCapture.setEnabled(true);
 			captureList.setEnabled(true);
+			Object selection = captureList.getSelectedItem();
+			refreshCaptureList();
+			captureList.setSelectedItem(selection);
+			captureList.setSelectMode(SelectMode.SINGLE);
 		}
+	}
+
+	private void refreshCaptureList() {
+		captureList.clear();
+		captureList.setListData(PivotUtils.translateJavaList2PivotList(serialCaptureService.getCaptureResultList()));
 	}
 
 	private void initGenerateSampleTab() {
@@ -244,11 +274,14 @@ public class MainWindow extends Window implements Bindable {
 					}
 				} catch (FunctionalException | IOException
 						| UnsupportedAudioFileException e) {
+					handleException(e);
 					LOG.error("Generator error", e);
-					Alert.alert(MessageType.ERROR, e.getLocalizedMessage(),
-							MainWindow.this);
 				}
 			}
 		});
+	}
+	
+	private void handleException(Throwable e) {
+		Alert.alert(MessageType.ERROR, e.getLocalizedMessage(), this);
 	}
 }

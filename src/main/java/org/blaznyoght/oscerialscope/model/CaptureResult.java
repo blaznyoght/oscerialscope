@@ -1,6 +1,7 @@
 package org.blaznyoght.oscerialscope.model;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class CaptureResult {
@@ -41,5 +42,16 @@ public class CaptureResult {
 
 	public void setPortName(String portName) {
 		this.portName = portName;
+	}
+	
+	public int getSampleCount() {
+		return getBuffer().size()/2;
+	}
+	
+	public String toString() {
+		return String.format("capture_%s_%s (%d samples)",
+				portName, 
+				new SimpleDateFormat("yyyyMMddHHmmss").format(startTime.getTime()),
+				getSampleCount());
 	}
 }
