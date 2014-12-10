@@ -1,5 +1,6 @@
 package org.blaznyoght.oscerialscope.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -23,7 +24,8 @@ public class SerialCaptureService {
 		STARTED(), STOPPED();
 	}
 
-	private static class CaptureThread implements Runnable, SerialPortEventListener {
+	private static class CaptureThread implements Runnable,
+			SerialPortEventListener {
 		private boolean shouldStop;
 		private final String portName;
 		private SerialPort serialPort;
@@ -68,12 +70,12 @@ public class SerialCaptureService {
 			if (serialPortEvent.isRXCHAR()) {
 				try {
 					byte[] buf = serialPort.readBytes();
-					result.getBuffer().put(buf);
-				} catch (SerialPortException e) {
+					result.getBuffer().write(buf);
+				} catch (SerialPortException | IOException e) {
 					// TODO handle Exception properly
 				}
 			}
-				
+
 		}
 
 	}
@@ -94,14 +96,27 @@ public class SerialCaptureService {
 		currentState = State.STARTED;
 	}
 
-	public synchronized void stopCapture() throws InvalidStateException {
+	public synchronized String stopCapture() throws InvalidStateException {
 		if (currentState.equals(State.STOPPED)) {
 			throw new InvalidStateException();
 		}
 		currentCapture.setShouldStop(true);
 		captureResultList.add(currentCapture.getResult());
+		String message = String.format(
+				"Capture %s terminated (%d samples captured)",
+				currentCapture.getResult(), 
+				currentCapture.getResult().getBuffer().size());
 		currentCapture = null;
 		currentState = State.STOPPED;
+		return message;
+	}
+
+	public boolean isRunning() {
+		return State.STARTED.equals(currentState);
+	}
+
+	public int getCaptureProgress() {
+		return currentCapture.getResult().getBuffer().size();
 	}
 
 }

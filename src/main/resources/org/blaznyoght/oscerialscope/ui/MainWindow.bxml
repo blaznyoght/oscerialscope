@@ -43,7 +43,7 @@
         				<ListView bxml:id="captureList" selectMode="none" listData="['None']"/>
         				<PushButton bxml:id="removeCapture" buttonData="%remove_capture" />
 	            	</BoxPane>
-	            	<Label bxml:id="captureStatusLabel" text="" styles="{font:{italic:true}}"/>
+	            	<Label bxml:id="captureStatusLabel" text=" " styles="{font:{italic:true}}"/>
         		</BoxPane>
 			</Border>
 		</BoxPane>

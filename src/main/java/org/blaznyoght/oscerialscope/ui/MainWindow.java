@@ -14,6 +14,9 @@ import org.apache.pivot.beans.Bindable;
 import org.apache.pivot.collections.List;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.util.Resources;
+import org.apache.pivot.util.concurrent.Task;
+import org.apache.pivot.util.concurrent.TaskExecutionException;
+import org.apache.pivot.util.concurrent.TaskListener;
 import org.apache.pivot.wtk.Alert;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
@@ -104,6 +107,28 @@ public class MainWindow extends Window implements Bindable {
 				try {
 					serialCaptureService.startCapture(port);
 					refreshCaptureIhm(true);
+					final Task<Integer> refreshStatusTask = new Task<Integer>() {
+						@Override
+						public Integer execute() throws TaskExecutionException {
+							return serialCaptureService.getCaptureProgress();
+						}
+						
+					};
+					refreshStatusTask.execute(new TaskListener<Integer>() {
+						@Override
+						public void taskExecuted(Task<Integer> task) {
+							String status = StringUtils.EMPTY;
+							if (serialCaptureService.isRunning()) {
+								status = String.format("Capturing...(%d samples so far)", task.getResult());
+								task.execute(this);
+							}
+							captureStatusLabel.setText(status);
+						}
+						@Override
+						public void executeFailed(Task<Integer> task) {
+							Alert.alert(MessageType.ERROR, task.getFault().getMessage(), MainWindow.this);
+						}
+					});
 				} catch (InvalidStateException e) {
 					Alert.alert(MessageType.ERROR, e.getMessage(),
 							MainWindow.this);
@@ -114,8 +139,9 @@ public class MainWindow extends Window implements Bindable {
 			@Override
 			public void buttonPressed(Button button) {
 				try {
-					serialCaptureService.stopCapture();
+					String message = serialCaptureService.stopCapture();
 					refreshCaptureIhm(false);
+					Alert.alert(MessageType.INFO, message, MainWindow.this);
 				} catch (InvalidStateException e) {
 					Alert.alert(MessageType.ERROR, e.getMessage(),
 							MainWindow.this);
@@ -146,7 +172,6 @@ public class MainWindow extends Window implements Bindable {
 			stopCapture.setEnabled(true);
 			removeCapture.setEnabled(false);
 			captureList.setEnabled(false);
-			captureStatusLabel.setText("Capturing...");
 		}
 		else {
 			serialInterfaceListView.setEnabled(true);
@@ -155,7 +180,6 @@ public class MainWindow extends Window implements Bindable {
 			stopCapture.setEnabled(false);
 			removeCapture.setEnabled(true);
 			captureList.setEnabled(true);
-			captureStatusLabel.setText(StringUtils.EMPTY);
 		}
 	}
 

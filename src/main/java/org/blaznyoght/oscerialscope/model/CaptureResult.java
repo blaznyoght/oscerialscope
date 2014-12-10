@@ -1,13 +1,13 @@
 package org.blaznyoght.oscerialscope.model;
 
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 
 public class CaptureResult {
 	Calendar startTime;
 	Calendar endTime;
 	
-	ByteBuffer buffer;
+	final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	
 	String portName;
 	
@@ -31,12 +31,8 @@ public class CaptureResult {
 		this.endTime = endTime;
 	}
 
-	public ByteBuffer getBuffer() {
+	public ByteArrayOutputStream getBuffer() {
 		return buffer;
-	}
-
-	public void setBuffer(ByteBuffer buffer) {
-		this.buffer = buffer;
 	}
 
 	public String getPortName() {
