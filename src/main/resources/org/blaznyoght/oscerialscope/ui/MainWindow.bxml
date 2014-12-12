@@ -1,61 +1,97 @@
-<mainWindow:MainWindow title="%oscerialscope" maximized="true"
-    xmlns:content="org.apache.pivot.wtk.content"
-	xmlns:bxml="http://pivot.apache.org/bxml"
-	xmlns:mainWindow="org.blaznyoght.oscerialscope.ui" 
+<mainWindow:MainWindow title="%oscerialscope"
+	maximized="true" xmlns:content="org.apache.pivot.wtk.content"
+	xmlns:bxml="http://pivot.apache.org/bxml" xmlns:mainWindow="org.blaznyoght.oscerialscope.ui"
 	xmlns="org.apache.pivot.wtk">
-	<TabPane bxml:id="tabPane">
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
-			<TabPane.tabData>
-				<content:ButtonData text="%generate" />
-			</TabPane.tabData>
-			<Border styles="{padding:2}">
-        		<BoxPane orientation="vertical" styles="{spacing:6}">
-	            	<Label text="%source_file" styles="{font:{bold:true}}"/>
-	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
-	            		<Label bxml:id="labelSourceFile" text="%none" />
-						<PushButton bxml:id="chooseSourceFile" buttonData="%choose_source_file"/>
-					</BoxPane>
-	            	<Label text="%target_file" styles="{font:{bold:true}}"/>
-	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
-	            		<Label bxml:id="labelTargetFile" text="%none" />
-						<PushButton bxml:id="chooseTargetFile" buttonData="%choose_target_file"/>
-					</BoxPane>
-					<PushButton bxml:id="generateFile" buttonData="%generate_file"/>
-				</BoxPane>
-			</Border>
-		</BoxPane>
+	<BoxPane orientation="vertical">
+		<TabPane bxml:id="tabPane">
+			<BoxPane
+				styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
+				<TabPane.tabData>
+					<content:ButtonData text="%generate" />
+				</TabPane.tabData>
+				<Border styles="{padding:2}">
+					<FillPane>
+						<BoxPane orientation="vertical" styles="{spacing:6}">
+							<Label text="%source_file" styles="{font:{bold:true}}" />
+							<BoxPane orientation="horizontal" styles="{spacing:6}">
+								<Label bxml:id="labelSourceFile" text="%none" />
+								<PushButton bxml:id="chooseSourceFile" buttonData="%choose_source_file" />
+							</BoxPane>
+							<Label text="%target_file" styles="{font:{bold:true}}" />
+							<BoxPane orientation="horizontal" styles="{spacing:6}">
+								<Label bxml:id="labelTargetFile" text="%none" />
+								<PushButton bxml:id="chooseTargetFile" buttonData="%choose_target_file" />
+							</BoxPane>
+							<BoxPane orientation="horizontal" styles="{spacing:6}">
+								<PushButton bxml:id="generateFile" buttonData="%generate_file" />
+								<PushButton bxml:id="generateCapture" buttonData="%generate_capture" />
+							</BoxPane>
+						</BoxPane>
+					</FillPane>
+				</Border>
+			</BoxPane>
 
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
-			<TabPane.tabData>
-				<content:ButtonData text="%capture" />
-			</TabPane.tabData>
-			<Border styles="{padding:2}">
-        		<BoxPane orientation="vertical" styles="{spacing:6}">
-	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
-        				<ListView bxml:id="serialInterfaceListView" selectMode="single" />
-        				<PushButton bxml:id="refreshSerialPortList" buttonData="%refresh_list" />
-        			</BoxPane>
-	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
-        				<PushButton bxml:id="startCapture" buttonData="%start_capture" />
-        				<PushButton bxml:id="stopCapture" buttonData="%stop_capture" enabled="false"/>
-	            	</BoxPane>
-	            	<BoxPane orientation="horizontal" styles="{spacing:6}">
-        				<ListView bxml:id="captureList" selectMode="none" listData="['None']"/>
-        				<PushButton bxml:id="removeCapture" buttonData="%remove_capture" />
-	            	</BoxPane>
-	            	<Label bxml:id="captureStatusLabel" text=" " styles="{font:{italic:true}}"/>
-        		</BoxPane>
-			</Border>
-		</BoxPane>
+			<BoxPane
+				styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
+				<TabPane.tabData>
+					<content:ButtonData text="%capture" />
+				</TabPane.tabData>
+				<Border styles="{padding:2}">
+					<FillPane>
+						<BoxPane orientation="vertical" styles="{spacing:6}">
+							<BoxPane orientation="horizontal" styles="{spacing:6}">
+								<ListView bxml:id="serialInterfaceListView" selectMode="single" />
+								<PushButton bxml:id="refreshSerialPortList"
+									buttonData="%refresh_list" />
+							</BoxPane>
+							<BoxPane orientation="horizontal" styles="{spacing:6}">
+								<PushButton bxml:id="startCapture" buttonData="%start_capture" />
+								<PushButton bxml:id="stopCapture" buttonData="%stop_capture"
+									enabled="false" />
+							</BoxPane>
+						</BoxPane>
+					</FillPane>
+				</Border>
+			</BoxPane>
 
-		<BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
-			<TabPane.tabData>
-				<content:ButtonData text="%view_listen" />
-			</TabPane.tabData>
-			<Border styles="{padding:2}">
-        		<BoxPane orientation="vertical" styles="{spacing:6}">
-        		</BoxPane>
-			</Border>
+			<BoxPane
+				styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
+				<TabPane.tabData>
+					<content:ButtonData text="%view" />
+				</TabPane.tabData>
+				<Border styles="{padding:2}">
+					<BoxPane bxml:id="chartBoxPane" orientation="vertical" styles="{spacing:6}">
+						<PushButton bxml:id="viewButton" buttonData="%view" />
+					</BoxPane>
+				</Border>
+			</BoxPane>
+
+			<BoxPane
+				styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
+				<TabPane.tabData>
+					<content:ButtonData text="%listen" />
+				</TabPane.tabData>
+				<Border styles="{padding:2}">
+					<BoxPane orientation="vertical" styles="{spacing:6}">
+					</BoxPane>
+				</Border>
+			</BoxPane>
+
+			<BoxPane
+				styles="{horizontalAlignment:'center', verticalAlignment:'center', fill:'true'}">
+				<TabPane.tabData>
+					<content:ButtonData text="%play" />
+				</TabPane.tabData>
+				<Border styles="{padding:2}">
+					<BoxPane orientation="vertical" styles="{spacing:6}">
+					</BoxPane>
+				</Border>
+			</BoxPane>
+		</TabPane>
+		<BoxPane orientation="horizontal" styles="{spacing:6}">
+			<ListView bxml:id="captureList" selectMode="none" listData="['None']" />
+			<PushButton bxml:id="removeCapture" buttonData="%remove_capture" />
 		</BoxPane>
-	</TabPane>
+		<Label bxml:id="captureStatusLabel" text="%ready" styles="{font:{italic:true}}" />
+	</BoxPane>
 </mainWindow:MainWindow>

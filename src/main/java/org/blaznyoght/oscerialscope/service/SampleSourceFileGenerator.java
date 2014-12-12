@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,13 +22,13 @@ import org.blaznyoght.oscerialscope.utils.MathUtils;
 public class SampleSourceFileGenerator {
 	private static final short DEFAULT_MIN_VALUE = 1;
 	private static final short DEFAULT_MAX_VALUE = 4095;
-	
+
 	private File sourceFile = null;
 	private File targetFile = null;
-	
+
 	private short minValue = DEFAULT_MIN_VALUE;
 	private short maxValue = DEFAULT_MAX_VALUE;
-	
+
 	public SampleSourceFileGenerator() {
 		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, null, null);
 	}
@@ -39,57 +40,73 @@ public class SampleSourceFileGenerator {
 		this.sourceFile = sourceFile;
 		this.targetFile = targetFile;
 	}
-	
+
 	public SampleSourceFileGenerator(File sourceFile, File targetFile) {
 		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, sourceFile, targetFile);
 	}
 
-	public boolean generateFile() throws IOException, UnsupportedAudioFileException {
+	public boolean generateFile() throws IOException,
+			UnsupportedAudioFileException {
 		if ((sourceFile == null) || (targetFile == null)) {
 			return false;
 		}
-		try (
-				InputStream is = new BufferedInputStream(new FileInputStream(sourceFile));
-				AudioInputStream audioStream = AudioSystem.getAudioInputStream(is);
-				PrintStream writer = new PrintStream(new FileOutputStream(targetFile));
-			) {
-			
-			AudioFormat sourceAudioFormat = audioStream.getFormat();
-			
-			System.out.println(sourceAudioFormat);
-			
-			byte[] buffer = new byte[1024];
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			int len;
-			while ((len = audioStream.read(buffer)) > 0) {
-				baos.write(buffer, 0, len);
-			}
-			
+		try (PrintStream writer = new PrintStream(new FileOutputStream(
+				targetFile));) {
+
+			ByteArrayOutputStream baos = generateBuffer();
+
 			ByteBuffer inputByteBuffer = ByteBuffer.wrap(baos.toByteArray());
 			inputByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-			
-			ByteBuffer outputByteBuffer = ByteBuffer.allocate(inputByteBuffer.capacity());
-			for(int i = 0; i < inputByteBuffer.capacity(); i+=2) {
+
+			ByteBuffer outputByteBuffer = ByteBuffer.allocate(inputByteBuffer
+					.capacity());
+			for (int i = 0; i < inputByteBuffer.capacity(); i += 2) {
 				Short inS = inputByteBuffer.getShort(i);
-				Short outS = MathUtils.map(inS, Short.MIN_VALUE, Short.MAX_VALUE, minValue, maxValue).shortValue();
+				Short outS = MathUtils.map(inS, Short.MIN_VALUE,
+						Short.MAX_VALUE, minValue, maxValue).shortValue();
 				outputByteBuffer.putShort(outS);
 			}
 
 			writer.println("PROGMEM uint16_t wav[] = {");
 			int bufLen = outputByteBuffer.capacity();
-			for(int i = 0; i < bufLen-2; i+=2) {
-				writer.print(String.format("0x%x, ", outputByteBuffer.getShort(i)));
+			for (int i = 0; i < bufLen - 2; i += 2) {
+				writer.print(String.format("0x%x, ",
+						outputByteBuffer.getShort(i)));
 				if ((i % 51) == 50) {
 					writer.print("\n\t");
 				}
 			}
-			writer.println(String.format("0x%x, ", outputByteBuffer.getShort(bufLen-2)));
+			writer.println(String.format("0x%x, ",
+					outputByteBuffer.getShort(bufLen - 2)));
 			writer.println("};\n");
-			
+
 			writer.println("\n");
-			writer.println(String.format("int wavLength = %d;", bufLen/2));
-			
+			writer.println(String.format("int wavLength = %d;", bufLen / 2));
+
 		}
 		return true;
+	}
+
+	public ByteArrayOutputStream generateBuffer() 
+			throws FileNotFoundException, IOException, UnsupportedAudioFileException {
+		if (sourceFile == null) {
+			return null;
+		}
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (
+			InputStream is = new BufferedInputStream(new FileInputStream(sourceFile));
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(is);
+		) {
+			AudioFormat sourceAudioFormat = audioStream.getFormat();
+
+			System.out.println(sourceAudioFormat);
+
+			byte[] buffer = new byte[1024];
+			int len;
+			while ((len = audioStream.read(buffer)) > 0) {
+				baos.write(buffer, 0, len);
+			}
+		}
+		return baos;
 	}
 }

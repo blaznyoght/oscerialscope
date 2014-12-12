@@ -1,8 +1,11 @@
 package org.blaznyoght.oscerialscope.ui;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -11,6 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pivot.beans.BXML;
 import org.apache.pivot.beans.Bindable;
+import org.apache.pivot.charts.ChartView.Category;
+import org.apache.pivot.charts.LineChartView;
+import org.apache.pivot.collections.ArrayList;
 import org.apache.pivot.collections.List;
 import org.apache.pivot.collections.Map;
 import org.apache.pivot.util.Resources;
@@ -18,6 +24,7 @@ import org.apache.pivot.util.concurrent.Task;
 import org.apache.pivot.util.concurrent.TaskExecutionException;
 import org.apache.pivot.util.concurrent.TaskListener;
 import org.apache.pivot.wtk.Alert;
+import org.apache.pivot.wtk.BoxPane;
 import org.apache.pivot.wtk.Button;
 import org.apache.pivot.wtk.ButtonPressListener;
 import org.apache.pivot.wtk.FileBrowserSheet;
@@ -35,6 +42,8 @@ import org.blaznyoght.oscerialscope.service.SerialCaptureService;
 import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
 import org.blaznyoght.oscerialscope.ui.exception.FunctionalException;
 import org.blaznyoght.oscerialscope.utils.PivotUtils;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class MainWindow extends Window implements Bindable {
 	private static final Logger LOG = LogManager.getLogger(MainWindow.class);
@@ -56,6 +65,9 @@ public class MainWindow extends Window implements Bindable {
 	@BXML
 	private PushButton generateFile = null;
 
+	@BXML
+	private PushButton generateCapture = null;
+
 	// Capture Tab
 	@BXML
 	private ListView serialInterfaceListView = null;
@@ -69,14 +81,26 @@ public class MainWindow extends Window implements Bindable {
 	@BXML
 	private PushButton stopCapture = null;
 
+	// View Tab
+	@BXML
+	private BoxPane chartBoxPane;
+
+	@BXML
+	private PushButton viewButton;
+
+	// Listen Tab
+
+	// Play Tab
+
+	// General
+	@BXML
+	private ListView captureList = null;
+
 	@BXML
 	private PushButton removeCapture = null;
 
 	@BXML
 	private Label captureStatusLabel = null;
-	
-	@BXML
-	private ListView captureList = null;
 
 	private SerialCaptureService serialCaptureService = new SerialCaptureService();
 
@@ -85,11 +109,49 @@ public class MainWindow extends Window implements Bindable {
 			Resources resources) {
 		initGenerateSampleTab();
 		initCaptureTab();
-		initViewListenTab();
+		initViewTab();
+		initListenTab();
+		initPlayTab();
 	}
 
-	private void initViewListenTab() {
+	private void initPlayTab() {
 		// TODO Auto-generated method stub
+
+	}
+
+	private void initListenTab() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void initViewTab() {
+		viewButton.getButtonPressListeners().add(new ButtonPressListener() {
+			@Override
+			public void buttonPressed(Button button) {
+				CaptureResult selected = (CaptureResult) captureList
+						.getSelectedItem();
+
+				XYSeriesCollection dataSet = new XYSeriesCollection();
+				XYSeries serie = new XYSeries(selected.toString());
+
+				int globalCount = 0;
+				ByteBuffer buffer = ByteBuffer.wrap(selected.getBuffer()
+						.toByteArray());
+				buffer.order(ByteOrder.LITTLE_ENDIAN);
+				for (int i = 0; i < buffer.capacity(); i += 2) {
+					serie.add(globalCount, buffer.getShort(i));
+					globalCount++;
+				}
+				
+				dataSet.addSeries(serie);
+				LineChartView chart = new LineChartView();
+				chart.getCategories().add(new Category(serie.getDescription(), serie.getDescription()));
+				List<XYSeriesCollection> chartData = new ArrayList<XYSeriesCollection>();
+				chartData.add(dataSet);
+				chart.setChartData(chartData);
+				chartBoxPane.add(chart);
+			}
+		});
 	}
 
 	private void initCaptureTab() {
@@ -117,24 +179,26 @@ public class MainWindow extends Window implements Bindable {
 						public Integer execute() throws TaskExecutionException {
 							try {
 								Thread.sleep(1000);
-							}
-							catch(InterruptedException e) {
+							} catch (InterruptedException e) {
 								throw new TaskExecutionException(e);
 							}
 							return serialCaptureService.getCaptureProgress();
 						}
-						
+
 					};
 					refreshStatusTask.execute(new TaskListener<Integer>() {
 						@Override
 						public void taskExecuted(Task<Integer> task) {
 							String status = StringUtils.EMPTY;
 							if (serialCaptureService.isRunning()) {
-								status = String.format("Capturing...(%d samples so far)", task.getResult());
+								status = String.format(
+										"Capturing...(%d samples so far)",
+										task.getResult());
 								task.execute(this);
 							}
 							captureStatusLabel.setText(status);
 						}
+
 						@Override
 						public void executeFailed(Task<Integer> task) {
 							handleException(task.getFault());
@@ -161,15 +225,15 @@ public class MainWindow extends Window implements Bindable {
 			@Override
 			public void buttonPressed(Button button) {
 				try {
-					CaptureResult capture = (CaptureResult) captureList.getSelectedItem();
+					CaptureResult capture = (CaptureResult) captureList
+							.getSelectedItem();
 					if (capture == null) {
 						throw new FunctionalException("No capture selected");
 					}
 					serialCaptureService.removeCapture(capture);
 					refreshCaptureList();
-					
-				}
-				catch(FunctionalException e) {
+
+				} catch (FunctionalException e) {
 					handleException(e);
 				}
 			}
@@ -183,7 +247,7 @@ public class MainWindow extends Window implements Bindable {
 						.listSerialPorts());
 		serialInterfaceListView.setListData(portList);
 	}
-	
+
 	private void refreshCaptureIhm(boolean captureRunning) {
 		if (captureRunning) {
 			serialInterfaceListView.setEnabled(false);
@@ -193,8 +257,7 @@ public class MainWindow extends Window implements Bindable {
 			removeCapture.setEnabled(false);
 			captureList.setEnabled(false);
 			captureList.setSelectMode(SelectMode.NONE);
-		}
-		else {
+		} else {
 			serialInterfaceListView.setEnabled(true);
 			refreshSerialPortList.setEnabled(true);
 			startCapture.setEnabled(true);
@@ -210,7 +273,14 @@ public class MainWindow extends Window implements Bindable {
 
 	private void refreshCaptureList() {
 		captureList.clear();
-		captureList.setListData(PivotUtils.translateJavaList2PivotList(serialCaptureService.getCaptureResultList()));
+		captureList.setListData(PivotUtils
+				.translateJavaList2PivotList(serialCaptureService
+						.getCaptureResultList()));
+		if (captureList.getListData().getLength() > 0) {
+			captureList.setSelectMode(SelectMode.SINGLE);
+		} else {
+			captureList.setSelectMode(SelectMode.NONE);
+		}
 	}
 
 	private void initGenerateSampleTab() {
@@ -268,9 +338,9 @@ public class MainWindow extends Window implements Bindable {
 							sourceFile, targetFile);
 					boolean result = generator.generateFile();
 					if (!result) {
-						throw new FunctionalException("generator_error");
+						throw new FunctionalException("%generator_error");
 					} else {
-						Alert.alert(MessageType.INFO, "done", MainWindow.this);
+						Alert.alert(MessageType.INFO, "%done", MainWindow.this);
 					}
 				} catch (FunctionalException | IOException
 						| UnsupportedAudioFileException e) {
@@ -279,8 +349,37 @@ public class MainWindow extends Window implements Bindable {
 				}
 			}
 		});
+
+		generateCapture.getButtonPressListeners().add(
+				new ButtonPressListener() {
+					@Override
+					public void buttonPressed(Button button) {
+						try {
+							if (sourceFile == null) {
+								throw new FunctionalException(
+										"source_file_missing");
+							}
+							SampleSourceFileGenerator generator = new SampleSourceFileGenerator(
+									sourceFile, targetFile);
+							ByteArrayOutputStream baos = generator
+									.generateBuffer();
+							if (baos == null) {
+								throw new FunctionalException(
+										"source_file_missing");
+							}
+							serialCaptureService.addGeneratedCapture(baos);
+							refreshCaptureList();
+							Alert.alert(MessageType.INFO, "%done",
+									MainWindow.this);
+						} catch (FunctionalException | IOException
+								| UnsupportedAudioFileException e) {
+							handleException(e);
+							LOG.error("%generator_error", e);
+						}
+					}
+				});
 	}
-	
+
 	private void handleException(Throwable e) {
 		Alert.alert(MessageType.ERROR, e.getLocalizedMessage(), this);
 	}

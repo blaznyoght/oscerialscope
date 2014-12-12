@@ -1,5 +1,6 @@
 package org.blaznyoght.oscerialscope.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,6 +126,16 @@ public class SerialCaptureService {
 
 	public void removeCapture(CaptureResult capture) {
 		captureResultList.remove(capture);
+	}
+
+	public void addGeneratedCapture(ByteArrayOutputStream baos) throws IOException {
+		CaptureResult result = new CaptureResult();
+		baos.writeTo(result.getBuffer());
+		Calendar startTime = Calendar.getInstance();
+		result.setStartTime(startTime);
+		result.setEndTime(startTime);
+		result.setPortName("Generator");
+		getCaptureResultList().add(result);
 	}
 
 }
