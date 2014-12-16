@@ -13,15 +13,23 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 
+import org.apache.commons.collections4.ListUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.blaznyoght.oscerialscope.model.CaptureResult;
 import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
 
 public class SerialCaptureService {
+	private static final Logger LOG = LogManager.getLogger(SerialCaptureService.class);
 
 	State currentState = State.STOPPED;
 	CaptureThread currentCapture = null;
 
-	private List<CaptureResult> captureResultList = new ArrayList<CaptureResult>();
+	private List<CaptureResult> captureResultList = new ArrayList<>();
+	
+	private List<CaptureResultListChangedListener> listeners = new ArrayList<>();
+	
+	private final ExceptionHandler exceptionHandler;
 
 	private static enum State {
 		STARTED(), STOPPED();
@@ -33,9 +41,11 @@ public class SerialCaptureService {
 		private final String portName;
 		private SerialPort serialPort;
 		private final CaptureResult result = new CaptureResult();
+		private ExceptionHandler handler;
 
-		public CaptureThread(String portName) {
+		public CaptureThread(String portName, ExceptionHandler handler) {
 			this.portName = portName;
+			this.handler = handler;
 			getResult().setPortName(portName);
 		}
 
@@ -64,7 +74,7 @@ public class SerialCaptureService {
 				}
 				getResult().setEndTime(Calendar.getInstance());
 			} catch (SerialPortException | InterruptedException e) {
-				// TODO handle Exception properly
+				handler.handleException(e);
 			}
 		}
 
@@ -75,12 +85,25 @@ public class SerialCaptureService {
 					byte[] buf = serialPort.readBytes();
 					result.getBuffer().write(buf);
 				} catch (SerialPortException | IOException e) {
-					// TODO handle Exception properly
+					handler.handleException(e);
 				}
 			}
 
 		}
 
+	}
+
+	public SerialCaptureService() {
+		this.exceptionHandler = new ExceptionHandler() {
+			@Override
+			public void handleException(Throwable t) {
+				LOG.error("Unhandled serial capture service error", t);
+			}
+		};
+	}
+
+	public SerialCaptureService(ExceptionHandler exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
 	}
 
 	public List<String> listSerialPorts() {
@@ -92,7 +115,7 @@ public class SerialCaptureService {
 		if (currentState.equals(State.STARTED)) {
 			throw new InvalidStateException();
 		}
-		currentCapture = new CaptureThread(portName);
+		currentCapture = new CaptureThread(portName, exceptionHandler);
 		new Thread(currentCapture).start();
 		currentState = State.STARTED;
 	}
@@ -103,6 +126,9 @@ public class SerialCaptureService {
 		}
 		currentCapture.setShouldStop(true);
 		captureResultList.add(currentCapture.getResult());
+		for(CaptureResultListChangedListener l : listeners) {
+			l.captureResultListChanged();
+		}
 		String message = String.format(
 				"Capture %s terminated (%d samples captured)",
 				currentCapture.getResult(), 
@@ -121,11 +147,14 @@ public class SerialCaptureService {
 	}
 
 	public List<CaptureResult> getCaptureResultList() {
-		return captureResultList;
+		return ListUtils.unmodifiableList(captureResultList);
 	}
 
 	public void removeCapture(CaptureResult capture) {
 		captureResultList.remove(capture);
+		for(CaptureResultListChangedListener l : listeners) {
+			l.captureResultListChanged();
+		}
 	}
 
 	public void addGeneratedCapture(ByteArrayOutputStream baos) throws IOException {
@@ -135,7 +164,18 @@ public class SerialCaptureService {
 		result.setStartTime(startTime);
 		result.setEndTime(startTime);
 		result.setPortName("Generator");
-		getCaptureResultList().add(result);
+		captureResultList.add(result);
+		for(CaptureResultListChangedListener l : listeners) {
+			l.captureResultListChanged();
+		}
+	}
+	
+	public void removeCaptureResultListChangedListener(CaptureResultListChangedListener l) {
+		listeners.remove(l);
+	}
+	
+	public void addCaptureResultListChangedListener(CaptureResultListChangedListener l) {
+		listeners.add(l);
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.blaznyoght.oscerialscope.ui;
+package org.blaznyoght.oscerialscope.ui.pivot;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,11 +36,11 @@ import org.apache.pivot.wtk.PushButton;
 import org.apache.pivot.wtk.Sheet;
 import org.apache.pivot.wtk.SheetCloseListener;
 import org.apache.pivot.wtk.Window;
+import org.blaznyoght.oscerialscope.exception.FunctionalException;
 import org.blaznyoght.oscerialscope.model.CaptureResult;
 import org.blaznyoght.oscerialscope.service.SampleSourceFileGenerator;
 import org.blaznyoght.oscerialscope.service.SerialCaptureService;
 import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
-import org.blaznyoght.oscerialscope.ui.exception.FunctionalException;
 import org.blaznyoght.oscerialscope.utils.PivotUtils;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
