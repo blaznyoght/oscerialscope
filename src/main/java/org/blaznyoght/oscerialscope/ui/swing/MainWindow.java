@@ -13,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BoxLayout;
@@ -37,6 +39,11 @@ import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
 import org.blaznyoght.oscerialscope.ui.swing.utils.CaptureResultModel;
 import org.blaznyoght.oscerialscope.ui.swing.utils.ConstraintsBuilder;
 import org.blaznyoght.oscerialscope.ui.swing.utils.WavFileFilter;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class MainWindow extends JFrame implements ExceptionHandler {
 	private static final long serialVersionUID = -3896331928947551067L;
@@ -45,6 +52,8 @@ public class MainWindow extends JFrame implements ExceptionHandler {
 
 	// View/Listen Tab
 	private JPanel viewListenPanel = new JPanel();
+
+	private ChartPanel currentChartPanel;
 
 	// Capture Tab
 	private JPanel capturePanel = new JPanel();
@@ -147,6 +156,48 @@ public class MainWindow extends JFrame implements ExceptionHandler {
 
 	private void initViewListenTab() {
 		tabbedPane.addTab("View/Listen", viewListenPanel);
+		viewListenPanel.setLayout(new GridBagLayout());
+		JButton viewButton = new JButton("View");
+		viewButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setStatus("Processing, please wait...");
+				viewListenPanel.remove(currentChartPanel);
+				CaptureResult selected = (CaptureResult) captureList
+						.getSelectedItem();
+
+				XYSeriesCollection dataSet = new XYSeriesCollection();
+				XYSeries serie = new XYSeries(selected.toString());
+
+				int globalCount = 0;
+				ByteBuffer buffer = ByteBuffer.wrap(selected.getBuffer()
+						.toByteArray());
+				buffer.order(ByteOrder.LITTLE_ENDIAN);
+				for (int i = 0; i < buffer.capacity(); i += 2) {
+					serie.add(globalCount, buffer.getShort(i));
+					globalCount++;
+				}
+				
+				dataSet.addSeries(serie);
+				JFreeChart chart = ChartFactory.createXYLineChart("Waveform", null, null, dataSet);
+				currentChartPanel = new ChartPanel(chart);
+				ConstraintsBuilder builder = new ConstraintsBuilder();
+				builder.insets(2);
+				viewListenPanel.add(currentChartPanel, builder.fill(BOTH).gridx(0).gridy(2).gridwidth(10).build());
+				setStatus("Done.");
+			}
+		});
+		JButton playButton = new JButton("Play");
+		ConstraintsBuilder builder = new ConstraintsBuilder();
+		builder.insets(2);
+		viewListenPanel.add(viewButton, builder.build());
+		viewListenPanel.add(playButton, builder.build());
+		JFreeChart chart = ChartFactory.createXYLineChart("Waveform", null, null, null);
+		currentChartPanel = new ChartPanel(chart);
+		viewListenPanel.add(currentChartPanel, builder.fill(BOTH).gridx(0).gridy(2).gridwidth(10).build());
+		
+		
 	}
 
 	private void initCaptureTab() {
