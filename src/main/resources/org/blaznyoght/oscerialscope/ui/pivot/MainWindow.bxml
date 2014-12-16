@@ -1,6 +1,6 @@
 <mainWindow:MainWindow title="%oscerialscope"
 	maximized="true" xmlns:content="org.apache.pivot.wtk.content"
-	xmlns:bxml="http://pivot.apache.org/bxml" xmlns:mainWindow="org.blaznyoght.oscerialscope.ui"
+	xmlns:bxml="http://pivot.apache.org/bxml" xmlns:mainWindow="org.blaznyoght.oscerialscope.ui.pivot"
 	xmlns="org.apache.pivot.wtk">
 	<BoxPane orientation="vertical">
 		<TabPane bxml:id="tabPane">

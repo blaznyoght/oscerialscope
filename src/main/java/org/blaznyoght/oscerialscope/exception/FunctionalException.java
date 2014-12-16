@@ -1,4 +1,4 @@
-package org.blaznyoght.oscerialscope.ui.exception;
+package org.blaznyoght.oscerialscope.exception;
 
 public class FunctionalException extends Exception {
 	/**

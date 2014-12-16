@@ -6,16 +6,16 @@ import org.apache.pivot.wtk.Application;
 import org.apache.pivot.wtk.DesktopApplicationContext;
 import org.apache.pivot.wtk.Display;
 import org.apache.pivot.wtk.Window;
-import org.blaznyoght.oscerialscope.ui.MainWindow;
+import org.blaznyoght.oscerialscope.ui.pivot.MainWindow;
 
 
-public class OscerialScope implements Application {
+public class OscerialScopePivot implements Application {
     private Window window = null;
 
     public static final String LANGUAGE_KEY = "language";
 
 	public static void main(String[] args) {
-		DesktopApplicationContext.main(OscerialScope.class, args);
+		DesktopApplicationContext.main(OscerialScopePivot.class, args);
 	}
 
 	@Override
