@@ -159,17 +159,21 @@ public class SerialCaptureService {
 		}
 	}
 
-	public void addGeneratedCapture(ByteArrayOutputStream baos) throws IOException {
+	public void addGeneratedCapture(String name, ByteArrayOutputStream baos) throws IOException {
 		CaptureResult result = new CaptureResult();
 		baos.writeTo(result.getBuffer());
 		Calendar startTime = Calendar.getInstance();
 		result.setStartTime(startTime);
 		result.setEndTime(startTime);
-		result.setPortName("Generator");
+		result.setPortName(name);
 		captureResultList.add(result);
 		for(CaptureResultListChangedListener l : listeners) {
 			l.captureResultListChanged();
 		}
+	}
+
+	public void addGeneratedCapture(ByteArrayOutputStream baos) throws IOException {
+		addGeneratedCapture("Generator", baos);
 	}
 	
 	public void removeCaptureResultListChangedListener(CaptureResultListChangedListener l) {

@@ -12,8 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jfree.util.Log;
 
 public class GroovyInterpreterService {
+	private static final Logger LOG = LogManager.getLogger(GroovyInterpreterService.class);
+	
 	List<PrintWriter> ouputs = new ArrayList<>();
 	
 	private int bufferSize = 1;
@@ -28,7 +33,9 @@ public class GroovyInterpreterService {
 		binding.setVariable("groovyScript", groovyScript);
 		binding.setVariable("bufferSize", bufferSize);
 		GroovyShell shell = new GroovyShell(binding);
-		shell.evaluate(wrapperGroovy.replaceAll("%script%", groovyScript));
+		String script = wrapperGroovy.replaceAll("%script%", groovyScript);
+		LOG.info(script);
+		shell.evaluate(script);
 //		return (ByteArrayOutputStream) binding.getVariable("outBuf");
 		return outBuf;
 	}

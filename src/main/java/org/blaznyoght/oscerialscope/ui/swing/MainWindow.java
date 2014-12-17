@@ -190,7 +190,7 @@ public class MainWindow extends JFrame implements ExceptionHandler {
 				byte[] inBuf = selected.getBuffer().toByteArray();
 				ByteArrayOutputStream baos = groovyInterpreter.process(
 						groovyScript, inBuf);
-				serialCapture.addGeneratedCapture(baos);
+				serialCapture.addGeneratedCapture("Groovy", baos);
 			}
 		});
 		ConstraintsBuilder builder = new ConstraintsBuilder();
