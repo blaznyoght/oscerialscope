@@ -20,7 +20,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 public class WavGraphTest {
-
 	
 	public static void main(String[] args) {
 		InputStream is = WavGraphTest.class.getClassLoader().getResourceAsStream("test.wav");
@@ -61,9 +60,6 @@ public class WavGraphTest {
 
 	        sourceLine.drain();
 	        sourceLine.close();
-	        
-
-
 			
 			dataSet.addSeries(serieWav);
 			JFreeChart chart = ChartFactory.createXYLineChart("Test", "time (ms)",

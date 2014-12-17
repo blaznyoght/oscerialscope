@@ -23,31 +23,47 @@ public class SampleSourceFileGenerator {
 	private static final short DEFAULT_MIN_VALUE = 1;
 	private static final short DEFAULT_MAX_VALUE = 4095;
 
-	private File sourceFile = null;
+	private InputStream sourceStream = null;
 	private File targetFile = null;
 
 	private short minValue = DEFAULT_MIN_VALUE;
 	private short maxValue = DEFAULT_MAX_VALUE;
 
-	public SampleSourceFileGenerator() {
-		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, null, null);
+	public SampleSourceFileGenerator() throws IOException {
+		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, (File) null, null);
 	}
 
 	public SampleSourceFileGenerator(short defaultMinValue,
-			short defaultMaxValue, File sourceFile, File targetFile) {
+			short defaultMaxValue, File sourceFile, File targetFile) 
+					throws IOException {
 		this.minValue = DEFAULT_MIN_VALUE;
 		this.maxValue = DEFAULT_MAX_VALUE;
-		this.sourceFile = sourceFile;
+		this.sourceStream = new FileInputStream(sourceFile);
 		this.targetFile = targetFile;
 	}
 
-	public SampleSourceFileGenerator(File sourceFile, File targetFile) {
+	public SampleSourceFileGenerator(short defaultMinValue,
+			short defaultMaxValue, InputStream is, File targetFile) 
+					throws IOException {
+		this.minValue = DEFAULT_MIN_VALUE;
+		this.maxValue = DEFAULT_MAX_VALUE;
+		this.sourceStream = is;
+		this.targetFile = targetFile;
+	}
+
+	public SampleSourceFileGenerator(File sourceFile, File targetFile) 
+			throws IOException {
 		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, sourceFile, targetFile);
+	}
+
+	public SampleSourceFileGenerator(InputStream is, File targetFile) 
+			throws IOException {
+		this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, is, targetFile);
 	}
 
 	public boolean generateFile() throws IOException,
 			UnsupportedAudioFileException {
-		if ((sourceFile == null) || (targetFile == null)) {
+		if ((sourceStream == null) || (targetFile == null)) {
 			return false;
 		}
 		try (PrintStream writer = new PrintStream(new FileOutputStream(
@@ -89,12 +105,12 @@ public class SampleSourceFileGenerator {
 
 	public ByteArrayOutputStream generateBuffer() 
 			throws FileNotFoundException, IOException, UnsupportedAudioFileException {
-		if (sourceFile == null) {
+		if (sourceStream == null) {
 			return null;
 		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (
-			InputStream is = new BufferedInputStream(new FileInputStream(sourceFile));
+			InputStream is = new BufferedInputStream(sourceStream);
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(is);
 		) {
 			AudioFormat sourceAudioFormat = audioStream.getFormat();

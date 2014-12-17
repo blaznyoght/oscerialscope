@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.blaznyoght.oscerialscope.model.CaptureResult;
 import org.blaznyoght.oscerialscope.service.exception.InvalidStateException;
+import org.blaznyoght.oscerialscope.service.handler.ExceptionHandler;
+import org.blaznyoght.oscerialscope.service.listener.CaptureResultListChangedListener;
 
 public class SerialCaptureService {
 	private static final Logger LOG = LogManager.getLogger(SerialCaptureService.class);

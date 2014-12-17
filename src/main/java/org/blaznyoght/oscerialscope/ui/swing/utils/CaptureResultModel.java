@@ -8,8 +8,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.blaznyoght.oscerialscope.model.CaptureResult;
-import org.blaznyoght.oscerialscope.service.CaptureResultListChangedListener;
 import org.blaznyoght.oscerialscope.service.SerialCaptureService;
+import org.blaznyoght.oscerialscope.service.listener.CaptureResultListChangedListener;
 
 public class CaptureResultModel implements ComboBoxModel<CaptureResult> {
 

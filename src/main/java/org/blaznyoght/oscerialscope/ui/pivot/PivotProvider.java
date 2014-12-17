@@ -1,4 +1,4 @@
-package org.blaznyoght.oscerialscope;
+package org.blaznyoght.oscerialscope.ui.pivot;
 
 import org.apache.pivot.beans.BXMLSerializer;
 import org.apache.pivot.collections.Map;
@@ -6,16 +6,16 @@ import org.apache.pivot.wtk.Application;
 import org.apache.pivot.wtk.DesktopApplicationContext;
 import org.apache.pivot.wtk.Display;
 import org.apache.pivot.wtk.Window;
-import org.blaznyoght.oscerialscope.ui.pivot.MainWindow;
+import org.blaznyoght.oscerialscope.ui.UIProvider;
 
 
-public class OscerialScopePivot implements Application {
+public class PivotProvider implements Application, UIProvider {
     private Window window = null;
 
     public static final String LANGUAGE_KEY = "language";
 
 	public static void main(String[] args) {
-		DesktopApplicationContext.main(OscerialScopePivot.class, args);
+		DesktopApplicationContext.main(PivotProvider.class, args);
 	}
 
 	@Override
@@ -40,6 +40,16 @@ public class OscerialScopePivot implements Application {
 
 	@Override
 	public void resume() throws Exception {
+	}
+
+	@Override
+	public void provideUI(String[] args) {
+		DesktopApplicationContext.main(PivotProvider.class, args);
+	}
+
+	@Override
+	public String getId() {
+		return "Pivot";
 	}
 
 }
