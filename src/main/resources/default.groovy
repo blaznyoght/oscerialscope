@@ -1,4 +1,4 @@
-short doLoop(inShort) {
+short doLoop(inShort, ctx) {
 	// Put your code below this limit
 	outShort = inShort
 	
