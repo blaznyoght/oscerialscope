@@ -28,7 +28,7 @@ public class GroovyInterpreterService {
 		binding.setVariable("groovyScript", groovyScript);
 		binding.setVariable("bufferSize", bufferSize);
 		GroovyShell shell = new GroovyShell(binding);
-		shell.evaluate(wrapperGroovy + groovyScript);
+		shell.evaluate(wrapperGroovy.replaceAll("%script%", groovyScript));
 //		return (ByteArrayOutputStream) binding.getVariable("outBuf");
 		return outBuf;
 	}
